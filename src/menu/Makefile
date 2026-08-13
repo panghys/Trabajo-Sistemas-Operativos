@@ -1,3 +1,3 @@
 all:
 
-	g++ menu.cpp -o main
+	g++ funcionesMenu.cpp -o main
