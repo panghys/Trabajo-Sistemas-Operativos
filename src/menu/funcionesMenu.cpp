@@ -2,9 +2,9 @@
 #include <fstream>
 #include <iostream>
 #include <cstdlib>
-using namespace std;
+#include "../../include/config.h" // importante poner este por si se quiere usar las variables de entorno
 
-void leerArchivo(char* path);
+using namespace std;
 
 struct User{
     public:
@@ -15,21 +15,9 @@ struct User{
         bool profile; // 0 user, 1 admin
 };
 
-int main(){
-    char* leerEnv = getenv("USER_FILE");
+int main(){ // esto es solo testing para probar como lee el archivo
+    getEnvVariable();
+    const char* leerEnv = getenv("USER_FILE");
     leerArchivo(leerEnv);
     return 0;
-}
-
-void leerArchivo(char* path){
-    ifstream file;
-    cout << "test";
-    file.open(path);
-    if(file.is_open()){
-        while (!file.eof()){
-            string linea;
-            getline(file,linea);
-            cout << linea << endl;
-        }
-    }
 }
