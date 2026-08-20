@@ -1,4 +1,2 @@
-1;Juan Carlos Bodoque;Bodoque;1234;ADMIN
-2;Janita Martinez;Janita;5678;GENERAL
 3;Pepito Estrella;Pepo;sfsd;GENERAL
 4;Jose Patricio;Jose;s123;GENERAL
