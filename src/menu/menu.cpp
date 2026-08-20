@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include "../../include/config.h"
 #include "../../include/estructuras.h"
 #include "../../include/funciones.h"
@@ -7,22 +6,57 @@
 using namespace std;
 
 void mostrarMenuPrincipal() {
-    cout << "\n===============================" << endl;
-    cout << "       SISTEMA DE GESTION      " << endl;
-    cout << "===============================" << endl;
+    cout << "\n===================================" << endl;
+    cout << "        SISTEMA DE GESTION         " << endl;
+    cout << "===================================" << endl;
     cout << "1. Listar Usuarios" << endl;
-    cout << "2. Cargar Usuarios a Memoria" << endl;
-    cout << "3. Ingresar Usuario" << endl;
-    cout << "4. Eliminar Usuario por ID" << endl;
-    cout << "-------------------------------" << endl;
-    cout << "5. Listar Perfiles" << endl;
-    cout << "6. Cargar Perfiles a Memoria" << endl;
-    cout << "7. Ingresar / Modificar Perfil" << endl;
-    cout << "8. Eliminar Perfil" << endl;
-    cout << "-------------------------------" << endl;
+    cout << "2. Ingresar Usuario" << endl;
+    cout << "3. Eliminar Usuario por ID" << endl;
+    cout << "-----------------------------------" << endl;
+    cout << "4. Listar Perfiles" << endl;
+    cout << "5. Ingresar / Modificar Perfil" << endl;
+    cout << "6. Eliminar Perfil" << endl;
+    cout << "-----------------------------------" << endl;
     cout << "0. Salir" << endl;
-    cout << "===============================" << endl;
+    cout << "===================================" << endl;
     cout << "Seleccione una opcion: ";
+}
+
+void ejecutarOpcion(int opcion, ListaUsuarios &lUsers, ListaPerfiles &lProfiles) {
+    switch (opcion) {
+        case 1:
+            listarUsuarios(lUsers);
+            break;
+        case 2:
+            ingresarUsuario(lUsers);
+            break;
+        case 3: {
+            cout << "Ingrese el ID del usuario a eliminar: ";
+            int id;
+            cin >> id;
+            eliminarUsuario(id, lUsers);
+            break;
+        }
+        case 4:
+            listarPerfiles(lProfiles);
+            break;
+        case 5:
+            ingresarPerfil(lProfiles);
+            break;
+        case 6: {
+            cout << "Ingrese el nombre del perfil a eliminar: ";
+            string nombrePerfil;
+            cin >> nombrePerfil;
+            eliminarPerfil(nombrePerfil, lProfiles);
+            break;
+        }
+        case 0:
+            cout << "Saliendo del programa..." << endl;
+            break;
+        default:
+            cout << "Opcion no valida. Intente nuevamente." << endl;
+            break;
+    }
 }
 
 int main() {
@@ -30,64 +64,17 @@ int main() {
 
     ListaUsuarios listaU;
     ListaPerfiles listaP;
-    int opcion = -1;
 
-    do {
+    // Carga inicial automatica en memoria
+    cargarUsuariosDesdeArchivo(listaU);
+    cargarPerfilesDesdeArchivo(listaP);
+
+    int opcion = -1;
+    while (opcion != 0) {
         mostrarMenuPrincipal();
         cin >> opcion;
-
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Opcion no valida. Ingrese un numero." << endl;
-            continue;
-        }
-
-        switch (opcion) {
-            case 1:
-                listarUsuarios(listaU);
-                break;
-            case 2:
-                cargarUsuariosDesdeArchivo(listaU);
-                cout << "Usuarios cargados en memoria: " << listaU.lista.size() << endl;
-                break;
-            case 3:
-                ingresarUsuario(listaU);
-                break;
-            case 4: {
-                cout << "Ingrese el ID del usuario a eliminar: ";
-                int idEliminar;
-                cin >> idEliminar;
-                eliminarUsuario(idEliminar, listaU);
-                break;
-            }
-            case 5:
-                listarPerfiles(listaP);
-                break;
-            case 6:
-                cargarPerfilesDesdeArchivo(listaP);
-                cout << "Perfiles cargados en memoria: " << listaP.lista.size() << endl;
-                break;
-            case 7:
-                ingresarPerfil(listaP);
-                break;
-            case 8: {
-                int opcPerf = 0;
-                cout << "Seleccione el perfil a eliminar (1. ADMIN / 2. GENERAL): ";
-                cin >> opcPerf;
-                if (opcPerf == 1) eliminarPerfil("ADMIN", listaP);
-                else if (opcPerf == 2) eliminarPerfil("GENERAL", listaP);
-                else cout << "Opcion no valida." << endl;
-                break;
-            }
-            case 0:
-                cout << "\nSaliendo del sistema..." << endl;
-                break;
-            default:
-                cout << "Opcion incorrecta. Intente de nuevo." << endl;
-                break;
-        }
-    } while (opcion != 0);
+        ejecutarOpcion(opcion, listaU, listaP);
+    }
 
     return 0;
 }
