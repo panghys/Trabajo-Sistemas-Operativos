@@ -1,4 +1,18 @@
-all:
-	g++ src/menu/funcionesMenu.cpp src/config.cpp -Iinclude -o bin/main
-	
-	# Esto es temporal, solo para poder ir probando las cosas desde funcionesMenu
+CXX = g++
+CXXFLAGS = -Wall -std=c++17 -Iinclude
+
+SRCS = bin/main.cpp \
+	   src/config.cpp \
+	   src/funcionesUsuarios.cpp \
+	   src/funcionesPerfiles.cpp \
+	   src/menu/output.cpp
+
+TARGET = bin/main
+
+all: $(TARGET)
+
+$(TARGET): $(SRCS)
+	$(CXX) $(CXXFLAGS) $(SRCS) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET)

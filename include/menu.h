@@ -1,6 +1,9 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <cstdlib>
+#ifndef MENU_H
+#define MENU_H
 
-using namespace std;
+#include "estructuras.h"
+
+void mostrarMenuPrincipal();
+void ejecutarOpcion(int opcion, ListaUsuarios &lUsers, ListaPerfiles &lProfiles);
+
+#endif

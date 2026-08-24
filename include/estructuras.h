@@ -19,7 +19,7 @@ struct ListaUsuarios {
 
 struct Perfil {
     std::string nombre;             // "GENERAL" o "ADMIN"
-    std::vector<int> idsUsuarios;   // Arreglo de IDs asociados
+    std::vector<int> opcionesMenu;   // Arreglo de opciones de menu permitidas para el perfil
 };
 
 struct ListaPerfiles {
