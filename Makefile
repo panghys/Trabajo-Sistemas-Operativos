@@ -1,13 +1,14 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Iinclude
 
-SRCS = bin/main.cpp \
-	   src/config.cpp \
-	   src/funcionesUsuarios.cpp \
-	   src/funcionesPerfiles.cpp \
-	   src/menu/output.cpp
+SRCS = src/main.cpp \
+       src/config.cpp \
+       src/funcionesUsuarios.cpp \
+       src/funcionesPerfiles.cpp \
+       src/menu.cpp
 
-TARGET = bin/main
+# Archivo ejecutable de salida
+TARGET = main.exe
 
 all: $(TARGET)
 
