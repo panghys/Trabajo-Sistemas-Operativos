@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
+#include <limits>
 #include "../include/funciones.h"
 #include "../include/estructuras.h"
 
@@ -96,7 +97,13 @@ void ingresarUsuario(ListaUsuarios &lUsers) {
     Usuario u;
     cout << "\n--- Ingresar Nuevo Usuario ---" << endl;
     cout << "Ingrese ID: ";
-    cin >> u.id;
+    if (!(cin >> u.id)) {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Error: Formato inválido. Por favor, ingrese un número." << endl;
+        return;
+    }
+    
     cin.ignore();
 
     for (const auto &usr : lUsers.lista) {
@@ -104,8 +111,7 @@ void ingresarUsuario(ListaUsuarios &lUsers) {
             cout << "Error: Ya existe un usuario con el ID " << u.id << "." << endl;
             return;
         }
-    }
-
+	}
     cout << "Ingrese Nombre: ";
     getline(cin, u.nombre);
 
