@@ -2,8 +2,8 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include "funciones.h"
-#include "estructuras.h"
+#include "../include/funciones.h"
+#include "../include/estructuras.h"
 
 using namespace std;
 
