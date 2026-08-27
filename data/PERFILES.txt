@@ -1,4 +1,0 @@
-ADMIN;0,1,2,3,4,1
-GENERAL;0,1,3
-TESTER;4
-Test;3
