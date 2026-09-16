@@ -1,25 +1,26 @@
 #ifndef ESTRUCTURAS_H
 #define ESTRUCTURAS_H
 
-#include <string>
 #include <vector>
+#include <cstring> // Para manipular los chat
 
 struct Usuario {
     int id;
-    std::string nombre;
-    std::string username;
-    std::string password;
-    std::string perfil; // "GENERAL" o "ADMIN"
+    char nombre[50];
+    char username[20];
+    char password[20];
+    char perfil[15]; // "GENERAL" o "ADMIN"
 };
 
 struct ListaUsuarios {
-    std::vector<Usuario> lista;
+    std::vector<Usuario> lista; 
     bool cargado = false;
 };
 
 struct Perfil {
-    std::string nombre;             // "GENERAL" o "ADMIN"
-    std::vector<int> opcionesMenu;   // Arreglo de opciones de menu permitidas para el perfil
+    char nombre[20];             // "GENERAL" o "ADMIN"
+    int opcionesMenu[10];        // Arreglo de opciones (como son 9 puse maximo 10)
+    int numOpciones;             // Cantidad real de opciones ingresadas
 };
 
 struct ListaPerfiles {

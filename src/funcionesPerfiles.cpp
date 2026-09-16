@@ -1,184 +1,110 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
-#include <cstdlib>
+#include <cstring>
 #include "../include/funciones.h"
 #include "../include/estructuras.h"
 
 using namespace std;
 
-//  Sobrescribe el archivo de perfiles con lo que esta en memoria
 static void reescribirArchivoPerfiles(const ListaPerfiles &lProfiles) {
     const char* path = getenv("PERFIL_FILE");
-    if (!path) {
-        cerr << "Error: PERFIL_FILE no definido en .env" << endl;
-        return;
-    }
-
-    ofstream file(path, ios::trunc);
-    if (!file.is_open()) {
-        cerr << "Error al abrir el archivo de perfiles para sobrescribir." << endl;
-        return;
-    }
-
+    if (!path) return;
+    ofstream file(path, ios::trunc | ios::binary);
     for (const auto &p : lProfiles.lista) {
-        file << p.nombre << ";";
-        for (size_t i = 0; i < p.opcionesMenu.size(); ++i) {
-            file << p.opcionesMenu[i];
-            if (i + 1 < p.opcionesMenu.size()) file << ",";
-        }
-        file << "\n";
+        file.write((const char*)&p, sizeof(Perfil));
     }
     file.close();
 }
 
-// Carga los perfiles desde el archivo a la memoria
 void cargarPerfilesDesdeArchivo(ListaPerfiles &lProfiles) {
     const char* path = getenv("PERFIL_FILE");
-    if (!path) {
-        cerr << "Error: PERFIL_FILE no definido en .env" << endl;
-        return;
-    }
-
-    ifstream file(path);
-    if (!file.is_open()) {
-        cerr << "No se pudo abrir el archivo de perfiles: " << path << endl;
-        return;
-    }
-
+    if (!path) return;
+    ifstream file(path, ios::binary);
     lProfiles.lista.clear();
-    string linea;
-
-    while (getline(file, linea)) {
-        if (linea.empty()) continue;
-
-        stringstream ss(linea);
-        string nombre, opcionesStr;
-
-        if (getline(ss, nombre, ';') && getline(ss, opcionesStr)) {
-            Perfil p;
-            p.nombre = nombre;
-
-            stringstream ssOpc(opcionesStr);
-            string opcToken;
-            while (getline(ssOpc, opcToken, ',')) {
-                if (!opcToken.empty()) {
-                    p.opcionesMenu.push_back(stoi(opcToken));
-                }
-            }
-            lProfiles.lista.push_back(p);
-        }
+    Perfil p;
+    while (file.read((char*)&p, sizeof(Perfil))) {
+        lProfiles.lista.push_back(p);
     }
-
     file.close();
     lProfiles.cargado = true;
 }
 
-// Guarda un perfil nuevo al final del archivo
 void guardarPerfilEnArchivo(const Perfil &perfil) {
     const char* path = getenv("PERFIL_FILE");
-    if (!path) {
-        cerr << "Error: PERFIL_FILE no definido en .env" << endl;
-        return;
-    }
-
-    ofstream file(path, ios::app);
-    if (!file.is_open()) {
-        cerr << "Error al abrir el archivo de perfiles para guardar." << endl;
-        return;
-    }
-
-    file << perfil.nombre << ";";
-    for (size_t i = 0; i < perfil.opcionesMenu.size(); ++i) {
-        file << perfil.opcionesMenu[i];
-        if (i + 1 < perfil.opcionesMenu.size()) file << ",";
-    }
-    file << "\n";
-
+    if (!path) return;
+    ofstream file(path, ios::app | ios::binary);
+    file.write((const char*)&perfil, sizeof(Perfil));
     file.close();
 }
 
-// Ingresa o anexa opciones permitidas a un perfil
 void ingresarPerfil(ListaPerfiles &lProfiles) {
-    if (!lProfiles.cargado) {
-        cargarPerfilesDesdeArchivo(lProfiles);
-    }
+    if (!lProfiles.cargado) cargarPerfilesDesdeArchivo(lProfiles);
 
     cout << "\n--- Ingresar / Modificar Perfil ---" << endl;
+    string tempNombre;
     cout << "Ingrese nombre del Perfil (ej. GENERAL / ADMIN): ";
-    string nombre;
-    cin >> nombre;
+    cin >> tempNombre;
 
     int opcionPermitida;
-    cout << "Ingrese numero de opcion de menu permitida (ej. 1, 2, 3...): ";
+    cout << "Ingrese numero de opcion de menu permitida: ";
     cin >> opcionPermitida;
 
     int indice = -1;
     for (size_t i = 0; i < lProfiles.lista.size(); ++i) {
-        if (lProfiles.lista[i].nombre == nombre) {
+        if (string(lProfiles.lista[i].nombre) == tempNombre) {
             indice = static_cast<int>(i);
             break;
         }
     }
 
     if (indice != -1) {
-        lProfiles.lista[indice].opcionesMenu.push_back(opcionPermitida);
-        reescribirArchivoPerfiles(lProfiles);
-        cout << "Opcion de menu agregada al perfil existente con exito." << endl;
+        if(lProfiles.lista[indice].numOpciones < 10) { 
+             lProfiles.lista[indice].opcionesMenu[lProfiles.lista[indice].numOpciones] = opcionPermitida;
+             lProfiles.lista[indice].numOpciones++;
+             reescribirArchivoPerfiles(lProfiles);
+             cout << "Opcion agregada al perfil existente." << endl;
+        } else {
+             cout << "Maximo de opciones alcanzado." << endl;
+        }
     } else {
         Perfil nuevo;
-        nuevo.nombre = nombre;
-        nuevo.opcionesMenu.push_back(opcionPermitida);
+        strncpy(nuevo.nombre, tempNombre.c_str(), sizeof(nuevo.nombre)-1);
+        nuevo.nombre[sizeof(nuevo.nombre)-1] = '\0';
+        nuevo.opcionesMenu[0] = opcionPermitida;
+        nuevo.numOpciones = 1;
+        
         lProfiles.lista.push_back(nuevo);
         guardarPerfilEnArchivo(nuevo);
-        cout << "Nuevo perfil registrado exitosamente." << endl;
+        cout << "Nuevo perfil registrado." << endl;
     }
 }
-
 
 void listarPerfiles(ListaPerfiles &lProfiles) {
-    if (lProfiles.cargado) {
-        for (const auto &p : lProfiles.lista) {
-            cout << p.nombre << endl;
+    if (!lProfiles.cargado) cargarPerfilesDesdeArchivo(lProfiles);
+    for (const auto &p : lProfiles.lista) {
+        cout << "Perfil: " << p.nombre << " | Opciones: ";
+        for(int i = 0; i < p.numOpciones; i++) {
+            cout << p.opcionesMenu[i] << " ";
         }
-    } else {
-        const char* path = getenv("PERFIL_FILE");
-        if (!path) return;
-
-        ifstream file(path);
-        if (!file.is_open()) return;
-
-        string linea;
-        while (getline(file, linea)) {
-            stringstream ss(linea);
-            string nombre;
-            if (getline(ss, nombre, ';')) {
-                cout << nombre << endl;
-            }
-        }
-        file.close();
+        cout << endl;
     }
 }
-// Elimina un perfil por su nombre
+
 void eliminarPerfil(const std::string &nombrePerfil, ListaPerfiles &lProfiles) {
-    if (!lProfiles.cargado) {
-        cargarPerfilesDesdeArchivo(lProfiles);
-    }
+    if (!lProfiles.cargado) cargarPerfilesDesdeArchivo(lProfiles);
 
     int indice = -1;
     for (size_t i = 0; i < lProfiles.lista.size(); ++i) {
-        if (lProfiles.lista[i].nombre == nombrePerfil) {
+        if (string(lProfiles.lista[i].nombre) == nombrePerfil) {
             indice = static_cast<int>(i);
             break;
         }
     }
-
     if (indice == -1) {
         cout << "No se encontro el perfil: " << nombrePerfil << endl;
         return;
     }
-
     lProfiles.lista.erase(lProfiles.lista.begin() + indice);
     reescribirArchivoPerfiles(lProfiles);
-    cout << "Perfil '" << nombrePerfil << "' eliminado correctamente." << endl;
+    cout << "Perfil '" << nombrePerfil << "' eliminado." << endl;
 }

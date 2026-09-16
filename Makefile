@@ -1,29 +1,13 @@
-CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Iinclude -Icalculo/include
+all: pgm multi admin
 
-SRCS_MAIN = src/main.cpp \
-            src/config.cpp \
-            src/funcionesUsuarios.cpp \
-            src/funcionesPerfiles.cpp \
-            src/menu.cpp \
-            calculo/src/palindromo.cpp \
-            calculo/src/fx.cpp
+pgm: src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp src/palindromo.cpp src/fx.cpp
+	g++ src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp src/palindromo.cpp src/fx.cpp -o pgm
 
-SRCS_MULTI = calculo/mainMatrices.cpp \
-             calculo/src/matrices.cpp
+multi: src/mainMatrices.cpp src/matrices.cpp
+	g++ src/mainMatrices.cpp src/matrices.cpp -o multi
 
-TARGET_MAIN = main.exe
-TARGET_MULTI = multi.exe
-
-all: $(TARGET_MAIN) $(TARGET_MULTI)
-
-#compila el menu
-$(TARGET_MAIN): $(SRCS_MAIN)
-	$(CXX) $(CXXFLAGS) $(SRCS_MAIN) -o $(TARGET_MAIN)
-
-#compila el codigo de las matrices
-$(TARGET_MULTI): $(SRCS_MULTI)
-	$(CXX) $(CXXFLAGS) $(SRCS_MULTI) -o $(TARGET_MULTI)
+admin: src/mainAdmin.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp
+	g++ src/mainAdmin.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp -o admin
 
 clean:
-	rm -f $(TARGET_MAIN) $(TARGET_MULTI)
+	rm -f pgm multi admin *.exe

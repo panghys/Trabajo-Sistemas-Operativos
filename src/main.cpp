@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include "../include/config.h"
 #include "../include/estructuras.h"
 #include "../include/funciones.h"
@@ -7,7 +8,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    // Cargar variables de entorno desde el archivo .env
     getEnvVariable();
 
     string argUsuario = "";
@@ -25,53 +25,61 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    // verifica que el usuario ingreso todo
     if (argUsuario.empty() || argPassword.empty() || argArchivo.empty()){
         cout << "Error: Debe ingresar usuario, password y archivo." << endl;
-        cout << "Uso: ./programa -u <usuario> -p <password> -f <archivo>" << endl;
+        cout << "Uso: ./pgm -u <usuario> -p <password> -f <archivo>" << endl;
         return 1;
     }
 
-    // Inicializar listas de usuarios y perfiles
     ListaUsuarios listaU;
     ListaPerfiles listaP;
-
-    // Cargar datos desde archivos
     cargarUsuariosDesdeArchivo(listaU);
     cargarPerfilesDesdeArchivo(listaP);
+
+    // Por si no hay ningun usuario creado
+    if (listaU.lista.empty()) {
+        cout << "\n[SISTEMA VACIO] Creando administrador por defecto..." << endl;
+        Usuario adminUser;
+        adminUser.id = 1;
+        strcpy(adminUser.nombre, "Administrador");
+        strcpy(adminUser.username, "admin");
+        strcpy(adminUser.password, "1234");
+        strcpy(adminUser.perfil, "ADMIN");
+        listaU.lista.push_back(adminUser);
+        guardarUsuarioEnArchivo(adminUser);
+        
+        cout << "Administrador creado exitosamente." << endl;
+        cout << "Por favor, re-ejecute con: -u admin -p 1234 -f " << argArchivo << "\n" << endl;
+        return 1;
+    }
     
     bool loginExitoso = false;
     string perfilUsuarioLogueado = "";
 
     for (const auto& usuario : listaU.lista) {
-        if (usuario.username == argUsuario && usuario.password == argPassword) {
+        if (string(usuario.username) == argUsuario && string(usuario.password) == argPassword) {
             loginExitoso = true;
-            perfilUsuarioLogueado = usuario.perfil;
+            perfilUsuarioLogueado = string(usuario.perfil);
             break;
         }
     }
 
-    // si no encuentra los datos o se ingresan daots erroneos se rechaza el acceso
     if (!loginExitoso) {
         cout << "Error: Usuario o Password incorrectos." << endl;
         return 1;
     }
 
     int opcion = -1;
-    
-    // Bucle principal del menu
     do {
         mostrarMenuPrincipal(argUsuario, perfilUsuarioLogueado);
         cin >> opcion;
 
-        // Validar entrada
         if (cin.fail()) {
             cin.clear();
             cin.ignore(10000, '\n');
             cout << "Opcion no valida. Ingrese un numero." << endl;
             continue;
         }
-
         ejecutarOpcion(opcion, listaU, listaP, argUsuario, perfilUsuarioLogueado, argArchivo);
     } while (opcion != 0);
 
