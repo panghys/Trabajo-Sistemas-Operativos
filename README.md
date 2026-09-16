@@ -27,3 +27,12 @@ El sistema utiliza un archivo ".env" ubicado en la raíz del proyecto para carga
 
 USER_FILE: Define la ruta exacta donde se encuentra el archivo de texto que almacena los registros de los usuarios (por ejemplo, "data/USUARIOS.TXT").
 PERFIL_FILE: Define la ruta exacta del archivo de texto que almacena la información de los perfiles y sus opciones de menú permitidas (por ejemplo, data/PERFILES.TXT).
+
+==================================================================================================================================================
+cabros porfa modifiquen el README con la tablita que nos pidieron en la entrega 1 es que no cache como se hace y dejen formal esto, a continuacion les dejare los comandos para compilar el programa principal y el programa que multiplica las matrices:
+
+Menu Principal
+  `g++ -Wall -std=c++17 -Iinclude src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp src/palindromo.cpp src/fx.cpp -o main.exe`
+
+Multiplicador de Matrices
+  `g++ -Wall -std=c++17 -Iinclude src/mainMatrices.cpp src/matrices.cpp -o multi.exe`

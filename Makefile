@@ -1,39 +1,29 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Iinclude
+CXXFLAGS = -Wall -std=c++17 -Iinclude -Icalculo/include
 
-SRCS = src/main.cpp \
-       src/config.cpp \
-       src/funcionesUsuarios.cpp \
-       src/funcionesPerfiles.cpp \
-       src/menu.cpp
+SRCS_MAIN = src/main.cpp \
+            src/config.cpp \
+            src/funcionesUsuarios.cpp \
+            src/funcionesPerfiles.cpp \
+            src/menu.cpp \
+            calculo/src/palindromo.cpp \
+            calculo/src/fx.cpp
 
-# Archivo ejecutable de salida
-TARGET = main.exe
+SRCS_MULTI = calculo/mainMatrices.cpp \
+             calculo/src/matrices.cpp
 
-all: $(TARGET)
+TARGET_MAIN = main.exe
+TARGET_MULTI = multi.exe
 
-$(TARGET): $(SRCS)
-	$(CXX) $(CXXFLAGS) $(SRCS) -o $(TARGET)
+all: $(TARGET_MAIN) $(TARGET_MULTI)
 
-clean:
-	rm -f $(TARGET)
+#compila el menu
+$(TARGET_MAIN): $(SRCS_MAIN)
+	$(CXX) $(CXXFLAGS) $(SRCS_MAIN) -o $(TARGET_MAIN)
 
-# NOTA: EL de arriba es el que teniamos, con ese se ejecuta todo lo de la entrega 1
-# el de abajo se lo pedí a la IA para que me ayude a ejecutar lo de calculo
-# si quieres ejecutar calculo, borra mientras el de arriba y usa el de abajo (lo mismo al revés)
-
-
-
-CC = g++
-CFLAGS = -Wall -std=c++11 -Icalculo/include
-
-SRC_MULTI = calculo/mainMatrices.cpp calculo/src/matrices.cpp
-EXEC_MULTI = multi
-
-all: $(EXEC_MULTI)
-
-$(EXEC_MULTI): $(SRC_MULTI)
-	$(CC) $(CFLAGS) $(SRC_MULTI) -o $(EXEC_MULTI)
+#compila el codigo de las matrices
+$(TARGET_MULTI): $(SRCS_MULTI)
+	$(CXX) $(CXXFLAGS) $(SRCS_MULTI) -o $(TARGET_MULTI)
 
 clean:
-	rm -f $(EXEC_MULTI)
+	rm -f $(TARGET_MAIN) $(TARGET_MULTI)
