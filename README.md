@@ -28,11 +28,12 @@ El sistema utiliza un archivo ".env" ubicado en la raíz del proyecto para carga
 USER_FILE: Define la ruta exacta donde se encuentra el archivo de texto que almacena los registros de los usuarios (por ejemplo, "data/USUARIOS.TXT").
 PERFIL_FILE: Define la ruta exacta del archivo de texto que almacena la información de los perfiles y sus opciones de menú permitidas (por ejemplo, data/PERFILES.TXT).
 
-==================================================================================================================================================
-cabros porfa modifiquen el README con la tablita que nos pidieron en la entrega 1 es que no cache como se hace y dejen formal esto, a continuacion les dejare los comandos para compilar el programa principal y el programa que multiplica las matrices:
+Para compilar y ejecutar el programa principal o el módulo de multiplicación de matrices utiliza las siguientes instrucciones:
 
-Menu Principal
-  `g++ -Wall -std=c++17 -Iinclude src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp src/palindromo.cpp src/fx.cpp -o main.exe`
+| Programa | Método | Comando de Compilación | Ejecución (Windows) | Ejecución (Linux / macOS) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Menú Principal** | Automatizado (`make`) | `make` | `.\main.exe` | `./main.exe` |
+| **Menú Principal** | Manual (`g++`) | `g++ -Wall -std=c++17 -Iinclude src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp src/palindromo.cpp src/fx.cpp -o main.exe` | `.\main.exe` | `./main.exe` |
+| **Multiplicador de Matrices** | Manual (`g++`) | `g++ -Wall -std=c++17 -Iinclude src/mainMatrices.cpp src/matrices.cpp -o multi.exe` | `.\multi.exe` | `./multi.exe` |
 
-Multiplicador de Matrices
-  `g++ -Wall -std=c++17 -Iinclude src/mainMatrices.cpp src/matrices.cpp -o multi.exe`
+---
