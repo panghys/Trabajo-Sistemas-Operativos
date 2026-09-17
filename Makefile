@@ -1,6 +1,7 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Iinclude -Icalculo/include
 
+<<<<<<< Updated upstream
 SRCS_MAIN = src/main.cpp \
             src/config.cpp \
             src/funcionesUsuarios.cpp \
@@ -24,6 +25,16 @@ $(TARGET_MAIN): $(SRCS_MAIN)
 #compila el codigo de las matrices
 $(TARGET_MULTI): $(SRCS_MULTI)
 	$(CXX) $(CXXFLAGS) $(SRCS_MULTI) -o $(TARGET_MULTI)
+=======
+pgm: src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp calculo/palindromo.cpp calculo/fx.cpp
+	g++ src/main.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp src/menu.cpp calculo/palindromo.cpp calculo/fx.cpp -o pgm
+
+multi: calculo/mainMatrices.cpp calculo/matrices.cpp
+	g++ calculo/mainMatrices.cpp calculo/matrices.cpp -o multi
+
+admin: admin/mainAdmin.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp
+	g++ admin/mainAdmin.cpp src/config.cpp src/funcionesUsuarios.cpp src/funcionesPerfiles.cpp -o admin
+>>>>>>> Stashed changes
 
 clean:
 	rm -f $(TARGET_MAIN) $(TARGET_MULTI)
