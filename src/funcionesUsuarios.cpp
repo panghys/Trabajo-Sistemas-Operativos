@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <cstring>
 #include <cstdlib>
 #include <limits>
 #include "../include/funciones.h"
@@ -15,18 +15,14 @@ static void reescribirArchivoUsuarios(const ListaUsuarios &lUsers) {
         return;
     }
 
-    ofstream file(path, ios::trunc);
+    ofstream file(path, ios::binary | ios::trunc);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo para sobrescribir: " << path << endl;
         return;
     }
 
     for (const auto &u : lUsers.lista) {
-        file << u.id << ";"
-             << u.nombre << ";"
-             << u.username << ";"
-             << u.password << ";"
-             << u.perfil << "\n";
+        file.write((char*)&u, sizeof(Usuario));
     }
     file.close();
 }
@@ -38,27 +34,24 @@ void cargarUsuariosDesdeArchivo(ListaUsuarios &lUsers) {
         return;
     }
 
-    ifstream file(path);
+    ifstream file(path, ios::binary);
     if (!file.is_open()) {
         cerr << "No se pudo abrir el archivo de usuarios: " << path << endl;
         return;
     }
 
     lUsers.lista.clear();
-    string linea;
+    bool reading = true;
 
-    while (getline(file, linea)) {
-        if (linea.empty()) continue;
-
-        stringstream ss(linea);
-        string token;
+    while (reading) {
         Usuario u;
+        strcpy(u.nombre, "empty");
+        file.read((char*)&u, sizeof(Usuario));
 
-        if (getline(ss, token, ';')) u.id = stoi(token);
-        if (getline(ss, token, ';')) u.nombre = token;
-        if (getline(ss, token, ';')) u.username = token;
-        if (getline(ss, token, ';')) u.password = token;
-        if (getline(ss, token, ';')) u.perfil = token;
+        if (!file || string(u.nombre) == "empty") {
+            reading = false;
+            break;
+        }
 
         lUsers.lista.push_back(u);
     }
@@ -74,18 +67,13 @@ void guardarUsuarioEnArchivo(const Usuario &user) {
         return;
     }
 
-    ofstream file(path, ios::app);
+    ofstream file(path, ios::binary | ios::app);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo para agregar usuario: " << path << endl;
         return;
     }
 
-    file << user.id << ";"
-         << user.nombre << ";"
-         << user.username << ";"
-         << user.password << ";"
-         << user.perfil << "\n";
-
+    file.write((char*)&user, sizeof(Usuario));
     file.close();
 }
 
@@ -103,7 +91,7 @@ void ingresarUsuario(ListaUsuarios &lUsers) {
         cout << "Error: Formato inválido. Por favor, ingrese un número." << endl;
         return;
     }
-    
+
     cin.ignore();
 
     for (const auto &usr : lUsers.lista) {
@@ -112,21 +100,29 @@ void ingresarUsuario(ListaUsuarios &lUsers) {
             return;
         }
 	}
+    string nombre, username, password;
+
     cout << "Ingrese Nombre: ";
-    getline(cin, u.nombre);
+    getline(cin, nombre);
+    strncpy(u.nombre, nombre.c_str(), sizeof(u.nombre) - 1);
+    u.nombre[sizeof(u.nombre) - 1] = '\0';
 
     cout << "Ingrese Username: ";
-    getline(cin, u.username);
+    getline(cin, username);
+    strncpy(u.username, username.c_str(), sizeof(u.username) - 1);
+    u.username[sizeof(u.username) - 1] = '\0';
 
     cout << "Ingrese Password: ";
-    getline(cin, u.password);
+    getline(cin, password);
+    strncpy(u.password, password.c_str(), sizeof(u.password) - 1);
+    u.password[sizeof(u.password) - 1] = '\0';
 
     int opcPerfil = 0;
     while (opcPerfil != 1 && opcPerfil != 2) {
         cout << "Seleccione Perfil (1. GENERAL / 2. ADMIN): ";
         cin >> opcPerfil;
-        if (opcPerfil == 1) u.perfil = "GENERAL";
-        else if (opcPerfil == 2) u.perfil = "ADMIN";
+        if (opcPerfil == 1) strcpy(u.perfil, "GENERAL");
+        else if (opcPerfil == 2) strcpy(u.perfil, "ADMIN");
         else cout << "Opcion no valida." << endl;
     }
     cin.ignore();
@@ -157,30 +153,29 @@ void listarUsuarios(ListaUsuarios &lUsers) {
             return;
         }
 
-        ifstream file(path);
+        ifstream file(path, ios::binary);
         if (!file.is_open()) {
             cout << "No se pudo leer el archivo de usuarios." << endl;
             return;
         }
 
-        string linea;
         bool vacio = true;
-        while (getline(file, linea)) {
-            if (linea.empty()) continue;
+        bool reading = true;
+        while (reading) {
+            Usuario u;
+            strcpy(u.nombre, "empty");
+            file.read((char*)&u, sizeof(Usuario));
+
+            if (!file || string(u.nombre) == "empty") {
+                reading = false;
+                break;
+            }
+
             vacio = false;
-
-            stringstream ss(linea);
-            string id, nom, usr, pass, perf;
-            getline(ss, id, ';');
-            getline(ss, nom, ';');
-            getline(ss, usr, ';');
-            getline(ss, pass, ';');
-            getline(ss, perf, ';');
-
-            cout << "ID: " << id 
-                 << " | Nombre: " << nom 
-                 << " | Username: " << usr 
-                 << " | Perfil: " << perf << endl;
+            cout << "ID: " << u.id 
+                 << " | Nombre: " << u.nombre 
+                 << " | Username: " << u.username 
+                 << " | Perfil: " << u.perfil << endl;
         }
         if (vacio) cout << "El archivo de usuarios esta vacio." << endl;
         file.close();
@@ -205,7 +200,7 @@ void eliminarUsuario(int id, ListaUsuarios &lUsers) {
         return;
     }
 
-    if (lUsers.lista[indice].perfil == "ADMIN") {
+    if (string(lUsers.lista[indice].perfil) == "ADMIN") {
         cout << "\n[ALERTA DE SEGURIDAD] El usuario que intenta eliminar es de perfil ADMIN." << endl;
         cout << "Esta seguro de que desea continuar? (1: Si / 0: No): ";
         int confirmar;

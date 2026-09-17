@@ -6,10 +6,10 @@
 
 struct Usuario {
     int id;
-    std::string nombre;
-    std::string username;
-    std::string password;
-    std::string perfil; // "GENERAL" o "ADMIN"
+    char nombre[50];
+    char username[30];
+    char password[30];
+    char perfil[10]; // "GENERAL" o "ADMIN"
 };
 
 struct ListaUsuarios {
@@ -18,8 +18,9 @@ struct ListaUsuarios {
 };
 
 struct Perfil {
-    std::string nombre;             // "GENERAL" o "ADMIN"
-    std::vector<int> opcionesMenu;   // Arreglo de opciones de menu permitidas para el perfil
+    char nombre[10];             // "GENERAL" o "ADMIN"
+    int opcionesMenu[10];        // Arreglo de opciones de menu permitidas para el perfil
+    int cantidadOpciones = 0;
 };
 
 struct ListaPerfiles {

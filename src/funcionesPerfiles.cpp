@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <cstring>
 #include <cstdlib>
 #include "../include/funciones.h"
 #include "../include/estructuras.h"
@@ -15,19 +15,14 @@ static void reescribirArchivoPerfiles(const ListaPerfiles &lProfiles) {
         return;
     }
 
-    ofstream file(path, ios::trunc);
+    ofstream file(path, ios::binary | ios::trunc);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo de perfiles para sobrescribir." << endl;
         return;
     }
 
     for (const auto &p : lProfiles.lista) {
-        file << p.nombre << ";";
-        for (size_t i = 0; i < p.opcionesMenu.size(); ++i) {
-            file << p.opcionesMenu[i];
-            if (i + 1 < p.opcionesMenu.size()) file << ",";
-        }
-        file << "\n";
+        file.write((char*)&p, sizeof(Perfil));
     }
     file.close();
 }
@@ -40,34 +35,26 @@ void cargarPerfilesDesdeArchivo(ListaPerfiles &lProfiles) {
         return;
     }
 
-    ifstream file(path);
+    ifstream file(path, ios::binary);
     if (!file.is_open()) {
         cerr << "No se pudo abrir el archivo de perfiles: " << path << endl;
         return;
     }
 
     lProfiles.lista.clear();
-    string linea;
+    bool reading = true;
 
-    while (getline(file, linea)) {
-        if (linea.empty()) continue;
+    while (reading) {
+        Perfil p;
+        strcpy(p.nombre, "empty");
+        file.read((char*)&p, sizeof(Perfil));
 
-        stringstream ss(linea);
-        string nombre, opcionesStr;
-
-        if (getline(ss, nombre, ';') && getline(ss, opcionesStr)) {
-            Perfil p;
-            p.nombre = nombre;
-
-            stringstream ssOpc(opcionesStr);
-            string opcToken;
-            while (getline(ssOpc, opcToken, ',')) {
-                if (!opcToken.empty()) {
-                    p.opcionesMenu.push_back(stoi(opcToken));
-                }
-            }
-            lProfiles.lista.push_back(p);
+        if (!file || string(p.nombre) == "empty") {
+            reading = false;
+            break;
         }
+
+        lProfiles.lista.push_back(p);
     }
 
     file.close();
@@ -82,19 +69,13 @@ void guardarPerfilEnArchivo(const Perfil &perfil) {
         return;
     }
 
-    ofstream file(path, ios::app);
+    ofstream file(path, ios::binary | ios::app);
     if (!file.is_open()) {
         cerr << "Error al abrir el archivo de perfiles para guardar." << endl;
         return;
     }
 
-    file << perfil.nombre << ";";
-    for (size_t i = 0; i < perfil.opcionesMenu.size(); ++i) {
-        file << perfil.opcionesMenu[i];
-        if (i + 1 < perfil.opcionesMenu.size()) file << ",";
-    }
-    file << "\n";
-
+    file.write((char*)&perfil, sizeof(Perfil));
     file.close();
 }
 
@@ -115,20 +96,28 @@ void ingresarPerfil(ListaPerfiles &lProfiles) {
 
     int indice = -1;
     for (size_t i = 0; i < lProfiles.lista.size(); ++i) {
-        if (lProfiles.lista[i].nombre == nombre) {
+        if (string(lProfiles.lista[i].nombre) == nombre) {
             indice = static_cast<int>(i);
             break;
         }
     }
 
     if (indice != -1) {
-        lProfiles.lista[indice].opcionesMenu.push_back(opcionPermitida);
+        Perfil &existente = lProfiles.lista[indice];
+        if (existente.cantidadOpciones >= (int)(sizeof(existente.opcionesMenu) / sizeof(int))) {
+            cout << "Error: El perfil ya alcanzo el maximo de opciones permitidas." << endl;
+            return;
+        }
+        existente.opcionesMenu[existente.cantidadOpciones] = opcionPermitida;
+        existente.cantidadOpciones++;
         reescribirArchivoPerfiles(lProfiles);
         cout << "Opcion de menu agregada al perfil existente con exito." << endl;
     } else {
         Perfil nuevo;
-        nuevo.nombre = nombre;
-        nuevo.opcionesMenu.push_back(opcionPermitida);
+        strncpy(nuevo.nombre, nombre.c_str(), sizeof(nuevo.nombre) - 1);
+        nuevo.nombre[sizeof(nuevo.nombre) - 1] = '\0';
+        nuevo.cantidadOpciones = 1;
+        nuevo.opcionesMenu[0] = opcionPermitida;
         lProfiles.lista.push_back(nuevo);
         guardarPerfilEnArchivo(nuevo);
         cout << "Nuevo perfil registrado exitosamente." << endl;
@@ -145,16 +134,21 @@ void listarPerfiles(ListaPerfiles &lProfiles) {
         const char* path = getenv("PERFIL_FILE");
         if (!path) return;
 
-        ifstream file(path);
+        ifstream file(path, ios::binary);
         if (!file.is_open()) return;
 
-        string linea;
-        while (getline(file, linea)) {
-            stringstream ss(linea);
-            string nombre;
-            if (getline(ss, nombre, ';')) {
-                cout << nombre << endl;
+        bool reading = true;
+        while (reading) {
+            Perfil p;
+            strcpy(p.nombre, "empty");
+            file.read((char*)&p, sizeof(Perfil));
+
+            if (!file || string(p.nombre) == "empty") {
+                reading = false;
+                break;
             }
+
+            cout << p.nombre << endl;
         }
         file.close();
     }
@@ -167,7 +161,7 @@ void eliminarPerfil(const std::string &nombrePerfil, ListaPerfiles &lProfiles) {
 
     int indice = -1;
     for (size_t i = 0; i < lProfiles.lista.size(); ++i) {
-        if (lProfiles.lista[i].nombre == nombrePerfil) {
+        if (string(lProfiles.lista[i].nombre) == nombrePerfil) {
             indice = static_cast<int>(i);
             break;
         }

@@ -2,24 +2,28 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 #include "include/matrices.h"
+#include "../include/estructuras.h"
 
 using namespace std;
 
 bool existeUsuario(const string &usuario) {
-    ifstream file("data/USUARIOS.TXT");
+    ifstream file("data/USUARIOS.TXT", ios::binary);
     if (!file.is_open()) return false;
 
-    string linea;
-    while (getline(file, linea)) {
-        if (linea.empty()) continue;
-        stringstream ss(linea);
-        string id, nombre, username;
-        getline(ss, id, ';');
-        getline(ss, nombre, ';');
-        getline(ss, username, ';');
+    bool reading = true;
+    while (reading) {
+        Usuario u;
+        strcpy(u.nombre, "empty");
+        file.read((char*)&u, sizeof(Usuario));
 
-        if (username == usuario) {
+        if (!file || string(u.nombre) == "empty") {
+            reading = false;
+            break;
+        }
+
+        if (string(u.username) == usuario) {
             return true;
         }
     }
@@ -27,17 +31,21 @@ bool existeUsuario(const string &usuario) {
 }
 
 bool existePerfil(const string &perfil) {
-    ifstream file("data/PERFILES.TXT");
+    ifstream file("data/PERFILES.TXT", ios::binary);
     if (!file.is_open()) return false;
 
-    string linea;
-    while (getline(file, linea)) {
-        if (linea.empty()) continue;
-        stringstream ss(linea);
-        string nombrePerfil;
-        getline(ss, nombrePerfil, ';');
+    bool reading = true;
+    while (reading) {
+        Perfil p;
+        strcpy(p.nombre, "empty");
+        file.read((char*)&p, sizeof(Perfil));
 
-        if (nombrePerfil == perfil) {
+        if (!file || string(p.nombre) == "empty") {
+            reading = false;
+            break;
+        }
+
+        if (string(p.nombre) == perfil) {
             return true;
         }
     }
