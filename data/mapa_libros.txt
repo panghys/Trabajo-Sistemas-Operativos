@@ -1,0 +1,51 @@
+1;Autobiografia de Benjamin Franklin.txt
+2;Confesiones de Jean Jacques Rousseau.txt
+3;Memorias de Napoleon Bonaparte.txt
+4;Memorias de U.S. Grant.txt
+5;Narrativa de la Vida de Frederick Douglass.txt
+6;De la Tierra a la Luna - Julio Verne.txt
+7;Frankenstein - Mary Shelley.txt
+8;La Guerra de los Mundos - H.G. Wells.txt
+9;La Isla Misteriosa - Julio Verne.txt
+10;La Maquina del Tiempo - H.G. Wells.txt
+11;Una Princesa de Marte - E.R. Burroughs.txt
+12;Veinte Mil Leguas de Viaje Submarino - Julio Verne.txt
+13;Viaje al Centro de la Tierra - Julio Verne.txt
+14;El Origen de las Especies - Charles Darwin.txt
+15;Investigacion sobre el Entendimiento Humano - David Hume.txt
+16;La Expresion de las Emociones - Charles Darwin.txt
+17;Opticks - Isaac Newton.txt
+18;Ana Karenina - Leon Tolstoi.txt
+19;Casa Desolada - Charles Dickens.txt
+20;Casa de Munecas - Henrik Ibsen.txt
+21;Crimen y Castigo - Dostoyevski.txt
+22;Cumbres Borrascosas - Emily Bronte.txt
+23;Don Quijote de la Mancha - Cervantes.txt
+24;El Conde de Montecristo - Alejandro Dumas.txt
+25;El Retrato de Dorian Gray - Oscar Wilde.txt
+26;Emma - Jane Austen.txt
+27;Grandes Esperanzas - Charles Dickens.txt
+28;Guerra y Paz - Leon Tolstoi.txt
+29;Hedda Gabler - Henrik Ibsen.txt
+30;Jane Eyre - Charlotte Bronte.txt
+31;La Duquesa de Malfi - John Webster.txt
+32;La Feria de las Vanidades - Thackeray.txt
+33;La Iliada - Homero.txt
+34;Los Hermanos Karamazov - Dostoyevski.txt
+35;Los Miserables - Victor Hugo.txt
+36;Los Tres Mosqueteros - Alejandro Dumas.txt
+37;Middlemarch - George Eliot.txt
+38;Moby Dick - Herman Melville.txt
+39;Obras Completas de Shakespeare.txt
+40;Orgullo y Prejuicio - Jane Austen.txt
+41;Alicia en el Pais de las Maravillas - Lewis Carroll.txt
+42;Dracula - Bram Stoker.txt
+43;El Maravilloso Mago de Oz - L.F. Baum.txt
+44;Gargantua y Pantagruel - Rabelais.txt
+45;La Maravillosa Tierra de Oz - L.F. Baum.txt
+46;Los Viajes de Gulliver - Jonathan Swift.txt
+47;Peter Pan - J.M. Barrie.txt
+48;Colmillo Blanco - Jack London.txt
+49;El Libro de la Selva - Rudyard Kipling.txt
+50;La Llamada de la Selva - Jack London.txt
+51;Walden - Henry David Thoreau.txt

@@ -7,6 +7,7 @@
 #include "../include/menu.h"
 #include "../include/palindromo.h"
 #include "../include/fx.h"
+#include "../include/indiceInvertido.h"
 
 using namespace std;
 
@@ -23,6 +24,7 @@ void mostrarMenuPrincipal(const std::string &usuario, const std::string &perfil)
     cout << "5. Calcular f(x) = x^2 + 2x + 8" << endl;
     cout << "6. CONTEO SOBRE TEXTO" << endl;
     cout << "7. CONTEO SOBRE ARCHIVO" << endl;
+    cout << "8. Crear indice invertido" << endl;
     cout << "-----------------------------------" << endl;
     cout << "0. Salir" << endl;
     cout << "===================================" << endl;
@@ -157,6 +159,17 @@ void ejecutarOpcion(int opcion, ListaUsuarios &lUsers, ListaPerfiles &lProfiles,
             cin >> ruta;
             realizarConteoArchivo(ruta);
             
+            int opcVolver = 0;
+            do {
+                cout << "\n1. VOLVER\nOpcion: ";
+                cin >> opcVolver;
+            } while (opcVolver != 1);
+            break;
+        }
+
+        case 8: {
+            crearIndiceInvertido();
+
             int opcVolver = 0;
             do {
                 cout << "\n1. VOLVER\nOpcion: ";

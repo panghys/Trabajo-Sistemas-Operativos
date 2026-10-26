@@ -7,6 +7,13 @@
 
 using namespace std;
 
+static string limpiarCadenaEnv(const string &str) {
+    size_t inicio = str.find_first_not_of(" \t\r\n");
+    if (inicio == string::npos) return "";
+    size_t fin = str.find_last_not_of(" \t\r\n");
+    return str.substr(inicio, fin - inicio + 1);
+}
+
 void getEnvVariable(){
     ifstream file(".env");
     if(!file.is_open()) {
@@ -16,9 +23,11 @@ void getEnvVariable(){
         while(getline(file, linea)){
             size_t l = linea.find('=');
             if(l != string::npos){
-                string fst = linea.substr(0, l);
-                string snd = linea.substr(l + 1);
-                guardarEnv(fst.c_str(), snd.c_str(), 1);
+                string fst = limpiarCadenaEnv(linea.substr(0, l));
+                string snd = limpiarCadenaEnv(linea.substr(l + 1));
+                if(!fst.empty()){
+                    guardarEnv(fst.c_str(), snd.c_str(), 1);
+                }
             }
         }
     }
