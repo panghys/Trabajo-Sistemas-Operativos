@@ -76,7 +76,7 @@ private:
     int contarEquiposActivos() const;
     void revisarInicio();
     void iniciarPartida();
-    void siguienteTurno(bool primero);
+    void siguienteTurno(bool primero, bool mantenerEquipo = false);
     void anunciarTurno(bool primero);
     void terminarPorAbandono();
     void finalizarPartida(int indiceEquipoGanador, int indiceJugadorGanador, const std::string &motivo);

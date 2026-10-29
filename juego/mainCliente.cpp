@@ -33,7 +33,7 @@ static int conectarServidor(const string &host, int puerto, string &error) {
     freeaddrinfo(resultado);
     if (descriptor < 0) {
         error = "No se pudo conectar con el servidor " + host + ":" + to_string(puerto) +
-                " (verifique que el servidor este iniciado).";
+                " (verifique que el servidor esté iniciado).";
     }
     return descriptor;
 }
@@ -41,7 +41,7 @@ static int conectarServidor(const string &host, int puerto, string &error) {
 static void mostrarAyuda() {
     cout << "\nComandos disponibles:" << endl;
     cout << "  lanzar        lanza el dado (solo en tu turno)" << endl;
-    cout << "  chat <texto>  envia un mensaje a todos los jugadores" << endl;
+    cout << "  chat <texto>  envía un mensaje a todos los jugadores" << endl;
     cout << "  estado        muestra posiciones y turno actual" << endl;
     cout << "  ayuda         muestra esta ayuda" << endl;
     cout << "  salir         abandona la partida" << endl;
@@ -106,7 +106,7 @@ int main() {
     ConfigJuego config;
     string error;
     if (!cargarConfigCliente(config, error)) {
-        cerr << "Error de configuracion: " << error << endl;
+        cerr << "Error de configuración: " << error << endl;
         return 1;
     }
 
@@ -143,7 +143,7 @@ int main() {
 
         string respuesta;
         if (!lector.leerLinea(respuesta)) {
-            cout << "El servidor cerro la conexion." << endl;
+            cout << "El servidor cerró la conexion." << endl;
             close(descriptor);
             return 1;
         }
@@ -183,7 +183,7 @@ int main() {
         if (consultas[1].revents & (POLLIN | POLLHUP | POLLERR)) {
             int recibidos = lector.recibirMas();
             if (recibidos <= 0) {
-                cout << "Conexion con el servidor finalizada." << endl;
+                cout << "Conexión con el servidor finalizada." << endl;
                 break;
             }
             while (lector.extraerLinea(lineaServidor)) {

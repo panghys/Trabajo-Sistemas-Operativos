@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <cctype>
+#include <unistd.h>
 #include "../include/config.h"
 #include "../include/estructuras.h"
 #include "../include/funciones.h"
@@ -97,28 +98,57 @@ void ejecutarOpcion(int opcion, ListaUsuarios &lUsers, ListaPerfiles &lProfiles,
             break;
         }
 
+
+
         case 3: {
             cout << "\n--- JUEGO ---" << endl;
-            cout << "Mensaje: En construccion" << endl;
+            cout << "Iniciando el servidor del juego..." << endl;
+        
+            #ifdef _WIN32
+                system("start \"Servidor del juego\" cmd /k servidor.exe");
+                system("timeout /t 2 /nobreak > nul");
+                system("cliente.exe");
+            #else
+                system("./servidor > servidor.log 2>&1 &");
+                sleep(2);
+                system("./cliente");
+            #endif
+        
             break;
         }
+
+
         
         case 4: {
-            cout << "\n--- ES PALINDROMO? ---" << endl;
-            cout << "1. Validar un texto" << endl;
-            cout << "2. Cancelar" << endl;
-            cout << "Opcion: ";
             int opcPal;
-            cin >> opcPal;
-            cin.ignore(); 
+
+            do{
+                cout << "\n--- ES PALINDROMO? ---" << endl;
+                cout << "1. Validar un texto" << endl;
+                cout << "2. Cancelar" << endl;
+                cout << "Opcion: ";
+
+                cin >> opcPal;
+                cin.ignore(); 
             
-            if (opcPal == 1) {
-                cout << "Ingrese el texto a validar: ";
-                string texto;
-                getline(cin, texto);
-                if (esPalindromo(texto)) cout << "\nResultado: SI es palindromo." << endl;
-                else cout << "\nResultado: NO es palindromo." << endl;
-            }
+                if (opcPal == 1) {
+                    cout << "Ingrese el texto a validar: ";
+                    string texto;
+                    getline(cin, texto);
+                    
+                    if (esPalindromo(texto))
+                        cout << "\nResultado: SI es palindromo." << endl;
+                    else 
+                        cout << "\nResultado: NO es palindromo." << endl;
+                }
+                else if (opcPal == 2) {
+                    cout << "\nVolviendo al menu principal..." << endl;
+                }
+                else{
+                    cout << "\nOpcion invalida. Intente nuevamente." << endl;
+                }
+            } while (opcPal != 2);
+            
             break;
         }
         

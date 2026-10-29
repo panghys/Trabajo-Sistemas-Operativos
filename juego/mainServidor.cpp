@@ -11,7 +11,7 @@ int main() {
     ConfigJuego config;
     string error;
     if (!cargarConfigServidor(config, error)) {
-        cerr << "Error de configuracion: " << error << endl;
+        cerr << "Error de configuración: " << error << endl;
         return 1;
     }
 

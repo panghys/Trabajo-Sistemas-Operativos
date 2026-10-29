@@ -356,27 +356,59 @@ void ServidorJuego::iniciarPartida() {
 void ServidorJuego::anunciarTurno(bool primero) {
     const Jugador &jugador = jugadores[jugadorEnTurno];
     string equipo = equipos[jugador.equipo].nombre;
+    if (equipo.size() == 7 && equipo.substr(0, 6) == "Equipo") {
+        equipo.insert(6, " ");
+    }
     registrarLog(jugador.nombre, equipo, primero ? "INICIA_TURNO" : "CAMBIA_TURNO");
     difundir(string("INFO ") + (primero ? "Turno de jugador: " : "Siguiente jugador: ") + jugador.nombre +
              " (" + equipo + ")");
     difundir("TURNO " + jugador.nombre + " " + equipo);
 }
 
-void ServidorJuego::siguienteTurno(bool primero) {
+void ServidorJuego::siguienteTurno(bool primero, bool mantenerEquipo) {
     if (contarEquiposActivos() < 2) {
         terminarPorAbandono();
         return;
     }
+
+    if (mantenerEquipo && jugadorEnTurno >= 0 && jugadorEnTurno < static_cast<int>(jugadores.size())){
+        int indiceEquipo = jugadores[jugadorEnTurno].equipo;
+
+        if (indiceEquipo >= 0 && indiceEquipo < static_cast<int>(equipos.size())){
+            Equipo &equipo = equipos[indiceEquipo];
+            int total = static_cast<int>(equipo.miembros.size());
+
+            for (int k = 0; k < total; ++k) {
+                int posicionMiembro = (equipo.siguienteMiembro + k) % total;
+
+                int candidato = equipo.miembros[posicionMiembro];
+
+                if (jugadores[candidato].conectado){
+                    equipo.siguienteMiembro = (posicionMiembro + 1) % total;
+
+                    jugadorEnTurno = candidato;
+                    anunciarTurno(primero);
+                    return;
+                }
+            }
+        }
+    }
+
     int cantidadEquipos = static_cast<int>(ordenEquipos.size());
+
     for (int intento = 0; intento < cantidadEquipos; ++intento) {
         indiceTurno = (indiceTurno + 1) % cantidadEquipos;
+        
         Equipo &equipo = equipos[ordenEquipos[indiceTurno]];
         int total = static_cast<int>(equipo.miembros.size());
+        
         for (int k = 0; k < total; ++k) {
             int posicionMiembro = (equipo.siguienteMiembro + k) % total;
             int candidato = equipo.miembros[posicionMiembro];
+            
             if (jugadores[candidato].conectado) {
                 equipo.siguienteMiembro = (posicionMiembro + 1) % total;
+                
                 jugadorEnTurno = candidato;
                 anunciarTurno(primero);
                 return;
@@ -465,6 +497,10 @@ int ServidorJuego::procesarUnirse(int descriptor, const string &direccion, const
     equipos[indiceEquipo].miembros.push_back(indice);
 
     string nombreEquipo = equipos[indiceEquipo].nombre;
+    if (nombreEquipo.size() == 7 && nombreEquipo.substr(0, 6) == "Equipo") {
+        nombreEquipo.insert(6, " ");
+    }
+
     enviarLinea(descriptor, "OK Bienvenido " + nombre + ", perteneces al " + nombreEquipo);
     registrarLog(nombre, nombreEquipo, "CONECTA", direccion);
     registrarLog(nombre, nombreEquipo, "UNE_EQUIPO", nombreEquipo);
@@ -544,31 +580,39 @@ void ServidorJuego::procesarEstado(int indice) {
 
 void ServidorJuego::desconectar(int descriptor, int indice, const string &direccion) {
     Cerrojo cerrojo(&semEstado);
+
     if (indice >= 0 && jugadores[indice].conectado) {
         Jugador &jugador = jugadores[indice];
         string equipo = equipos[jugador.equipo].nombre;
+
         jugador.conectado = false;
         jugador.descriptor = -1;
+
         registrarLog(jugador.nombre, equipo, "DESCONECTA", direccion);
 
         if (fase == FaseJuego::espera) {
             vector<int> &miembros = equipos[jugador.equipo].miembros;
+
             for (size_t i = 0; i < miembros.size(); ++i) {
                 if (miembros[i] == indice) {
                     miembros.erase(miembros.begin() + static_cast<long>(i));
                     break;
                 }
             }
-            difundir("INFO " + jugador.nombre + " se desconecto");
+
+            difundir("INFO " + jugador.nombre + " se desconectó");
             difundir("INFO " + mensajeEspera());
+
         } else if (fase == FaseJuego::enCurso) {
-            difundir("INFO " + jugador.nombre + " se desconecto");
+            difundir("INFO " + jugador.nombre + " se desconectó");
+            
             if (indice == jugadorEnTurno) {
-                siguienteTurno(false);
+                siguienteTurno(false, true);
             } else if (contarEquiposActivos() < 2) {
                 terminarPorAbandono();
             }
         }
+
     } else if (indice < 0) {
         registrarLog("-", "-", "CONEXION_CERRADA", direccion);
     }
